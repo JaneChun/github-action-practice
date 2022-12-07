@@ -1,0 +1,39 @@
+name: client # GitHub 리포지토리의 작업 탭에 표시될 워크플로의 이름
+on:
+  push: # 워크플로 파일을 자동으로 트리거하는 이벤트를 지정 (e.g. push, pull_request)
+    branches:
+      - reference # reference 브랜치에 push되면 아래 워크플로가 실행된다.
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout source code.
+        uses: actions/checkout@v2
+
+      - name: Install dependencies # 의존 파일 설치
+        run: npm ci
+        working-directory: ./my-agora-states-client
+
+      - name: Build # React Build
+        run: npm build
+        working-directory: ./my-agora-states-client
+
+      - name: SHOW AWS CLI VERSION 
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_EC2_METADATA_DISABLED: true
+        run: |
+          aws --version
+
+      - name: Sync Bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_EC2_METADATA_DISABLED: true
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            build s3://fe-115-janechun-s3 \
+            --delete
+        working-directory: ./my-agora-states-client
