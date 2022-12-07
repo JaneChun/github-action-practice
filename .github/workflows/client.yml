@@ -33,7 +33,7 @@ jobs:
           AWS_EC2_METADATA_DISABLED: true
         # aws s3 sync <동기화 주체> <동기화 대상>
         run: |
-          aws s3 sync ./my-agora-states-client s3://fe-115-janechun-s3 \
+          aws s3 sync ./my-agora-states-client/build s3://fe-115-janechun-s3 \
             --region ap-northeast-2 \
             build s3://fe-115-janechun-s3 \
             --delete
